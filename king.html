@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title id="siteTitle">ALL KINGS</title>
+    <link rel="icon" id="siteFavicon" href="">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* กำหนดเรียกใช้งานฟอนต์ UNDER BOOM (สามารถเปลี่ยนลิงก์ URL เป็นไฟล์ฟอนต์ .ttf บนโฮสต์ของคุณได้) */
+        @font-face {
+            font-family: 'UnderBoom';
+            src: url('UNDER BOOM.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        :root {
+            --bg-deep: #030305; 
+            --accent: #ffffff; 
+        }
+        @keyframes pageFadeIn { 
+            0% { opacity: 0; filter: blur(10px); transform: scale(1.03); } 
+            100% { opacity: 1; filter: blur(0); transform: scale(1); } 
+        }
+        body { 
+            margin: 0; padding: 0; min-height: 100vh; min-height: 100dvh; width: 100vw; 
+            font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-deep); color: #ffffff; 
+            overflow-x: hidden; display: flex; flex-direction: column; 
+            animation: pageFadeIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+        }
+        #bg-image { 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            background-size: cover; background-position: center; z-index: 0; 
+            filter: brightness(0.25) contrast(110%); will-change: transform; 
+            animation: bgZoom 60s cubic-bezier(0.37, 0, 0.63, 1) infinite alternate;
+        }
+        @keyframes bgZoom { 0% { transform: scale(1); } 100% { transform: scale(1.12); } }
+
+        .bg-overlay { 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            background: radial-gradient(circle at center, rgba(3, 3, 5, 0.6) 0%, rgba(2, 2, 4, 0.92) 80%, rgba(1, 1, 2, 0.98) 100%); 
+            z-index: 1; pointer-events: none; 
+        }
+        #particleCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; pointer-events: none; }
+        
+        .container { 
+            position: relative; z-index: 3; max-width: 1400px; margin: 0 auto; 
+            padding: 30px 20px 100px; width: 100%; box-sizing: border-box; flex: 1; 
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 100vh; 
+        }
+        
+        .top-nav { display: flex; justify-content: flex-start; align-items: center; width: 100%; max-width: 1200px; }
+        .btn-back { text-decoration: none; color: #ccc; font-weight: 600; font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; padding: 10px 22px; border: 1px solid rgba(255,255,255,0.25); border-radius: 8px; background: rgba(12, 12, 20, 0.75); backdrop-filter: blur(15px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
+        .btn-back:hover { background: rgba(25, 25, 35, 0.95); color: #fff; border-color: #fff; transform: translateY(-3px); box-shadow: 0 8px 25px rgba(255,255,255,0.25); }
+        
+        .header-title-box { display: flex; flex-direction: column; align-items: flex-start; width: 100%; max-width: 1200px; margin-top: 10px; }
+        
+        @keyframes titleGlow {
+            0%, 100% { filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3)); }
+            50% { filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.7)); }
+        }
+
+        .page-title { 
+            font-family: 'Cinzel', serif; 
+            font-size: clamp(2.5rem, 5vw, 4.2rem); 
+            letter-spacing: 0.18em; 
+            margin: 0; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            background: linear-gradient(90deg, #ffffff 0%, #a4b0be 25%, #ffffff 50%, #f1f2f6 75%, #ffffff 100%);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: titleGlow 4s ease-in-out infinite; 
+        }
+
+        .leader-count-box { display: flex; align-items: baseline; gap: 12px; margin-top: 6px; }
+        .leader-number { font-family: 'Cinzel', serif; font-size: 1.8rem; font-weight: 700; color: #fff; line-height: 1; text-shadow: 0 0 20px rgba(255,255,255,0.5); }
+        .leader-label { font-size: 0.65rem; color: #aaa; letter-spacing: 0.35em; text-transform: uppercase; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        .cards-fan-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 40px 0;
+            min-height: 600px;
+            perspective: 1800px;
+        }
+
+        .cards-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            height: 520px;
+        }
+
+        @keyframes shimmerHolographic {
+            0% { transform: translateX(-160%) rotate(25deg); opacity: 0; }
+            30% { opacity: 0.6; }
+            70% { opacity: 0.6; }
+            100% { transform: translateX(160%) rotate(25deg); opacity: 0; }
+        }
+
+        .elite-card {
+            position: absolute;
+            width: 265px;
+            height: 495px;
+            background: linear-gradient(135deg, #141420 0%, #060609 100%);
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 12px 14px 12px;
+            box-sizing: border-box;
+            cursor: pointer;
+            overflow: hidden;
+            filter: grayscale(70%) contrast(115%);
+            will-change: transform, filter, box-shadow, opacity;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), 
+                        filter 0.5s cubic-bezier(0.16, 1, 0.3, 1), 
+                        box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1), 
+                        opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .elite-card::after {
+            content: '';
+            position: absolute;
+            top: -60%; left: -60%;
+            width: 220%; height: 220%;
+            background: linear-gradient(
+                90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.05), 
+                rgba(255, 255, 255, 0.3), 
+                rgba(255, 255, 255, 0.05), 
+                transparent
+            );
+            transform: translateX(-160%) rotate(25deg);
+            pointer-events: none;
+            animation: shimmerHolographic 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        .cards-wrapper.has-selection .elite-card:not(.selected) {
+            filter: grayscale(100%) contrast(85%) brightness(0.25);
+            opacity: 0.25;
+            transform: scale(0.96);
+        }
+
+        .elite-card.selected {
+            filter: grayscale(0%) contrast(100%) brightness(1.05);
+            transform: translateY(-40px) scale(1.18) rotate(0deg) !important;
+            z-index: 99999 !important;
+            border-color: #ffffff;
+            box-shadow: 0 45px 90px rgba(0,0,0,0.9), 0 0 40px rgba(255,255,255,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
+            opacity: 1 !important;
+        }
+
+        .card-avatar {
+            width: 100%;
+            height: 355px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1.5px solid rgba(255,255,255,0.22);
+            margin-bottom: 6px;
+            background-color: #1a1a24;
+            transition: all 0.4s ease;
+        }
+
+        .elite-card.selected .card-avatar {
+            border-color: #fff;
+            box-shadow: 0 0 25px rgba(255,255,255,0.6);
+        }
+
+        /* เอฟเฟกต์ฟอนต์ UNDER BOOM สไตล์โครเมี่ยมวิบวับเฉพาะตัวหนังสือ */
+        @keyframes chromeSparkleInternal {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .card-name {
+            font-family: 'UnderBoom', sans-serif;
+            font-size: 1.6rem;
+            letter-spacing: 0.05em;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            margin-top: 4px;
+            background: linear-gradient(135deg, #d2d6dc 0%, #ffffff 25%, #7f8c8d 45%, #ffffff 65%, #95a5a6 85%, #ffffff 100%);
+            background-size: 300% 300%;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: chromeSparkleInternal 2.5s ease-in-out infinite;
+            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.95));
+        }
+
+        .card-role {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.58rem;
+            color: #94a3b8;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            margin-top: 3px;
+            font-weight: 700;
+            transition: color 0.3s;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        }
+
+        .elite-card.selected .card-role {
+            color: #fff;
+            text-shadow: 0 0 12px rgba(255,255,255,0.9);
+        }
+
+        /* ปุ่ม Social เรียงแนวตั้งด้านล่าง (Facebook บน / Instagram ล่าง) */
+        .social-buttons-column {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+            margin-top: auto;
+            padding-top: 6px;
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .elite-card.selected .social-buttons-column {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .social-btn {
+            width: 100%;
+            padding: 8px 0;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+            backdrop-filter: blur(5px);
+        }
+
+        .social-btn.fb-btn:hover {
+            background: #1877f2;
+            border-color: #1877f2;
+            box-shadow: 0 0 20px rgba(24, 119, 242, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .social-btn.ig-btn:hover {
+            background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            border-color: #e6683c;
+            box-shadow: 0 0 20px rgba(220, 39, 67, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .no-elite { text-align: center; color: #777; font-size: 0.9rem; letter-spacing: 0.2em; text-transform: uppercase; font-family: 'Cinzel', serif; }
+
+        /* MUSIC WIDGET พรีเมียม Responsive */
+        .music-widget {
+            position: fixed; bottom: 20px; right: 20px; 
+            background: rgba(15, 15, 22, 0.55); 
+            backdrop-filter: blur(30px) saturate(140%); 
+            -webkit-backdrop-filter: blur(30px) saturate(140%);
+            border: 1px solid rgba(255, 255, 255, 0.22); 
+            border-radius: 20px; 
+            width: 290px; z-index: 99999; 
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            overflow: hidden; display: flex; flex-direction: column; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+        }
+        .music-widget.collapsed { height: 68px; }
+        .music-widget.expanded { height: 130px; border-color: rgba(255,255,255,0.4); }
+        
+        .music-header { display: flex; align-items: center; padding: 10px 14px; height: 68px; box-sizing: border-box; cursor: pointer; }
+        .cover-wrapper { position: relative; width: 40px; height: 40px; margin-right: 12px; flex-shrink: 0; }
+        .music-cover { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; animation: spinRecord 6s linear infinite; animation-play-state: paused; position: relative; z-index: 2; border: 1px solid rgba(255,255,255,0.3); }
+        .playing .music-cover { animation-play-state: running; }
+        @keyframes spinRecord { 100% { transform: rotate(360deg); } }
+
+        .music-info-mini { flex: 1; display: flex; flex-direction: column; overflow: hidden; justify-content: center;}
+        .info-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; padding-right: 5px; }
+        .music-label { font-size: 0.42rem; color: #aaa; letter-spacing: 0.25em; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .eq-visualizer { display: flex; gap: 2px; align-items: flex-end; height: 10px; opacity: 0; transition: 0.3s; }
+        .playing .eq-visualizer { opacity: 1; }
+        .eq-visualizer span { width: 2px; background: #fff; border-radius: 2px; animation: eqBounce 1s infinite ease-in-out; }
+        .eq-visualizer span:nth-child(1) { animation-delay: 0.1s; height: 60%; }
+        .eq-visualizer span:nth-child(2) { animation-delay: 0.3s; height: 100%; }
+        .eq-visualizer span:nth-child(3) { animation-delay: 0.0s; height: 40%; }
+        @keyframes eqBounce { 0%, 100% { transform: scaleY(0.4); } 50% { transform: scaleY(1); } }
+
+        .music-title { font-size: 0.82rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; letter-spacing: 0.05em; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .music-link { font-size: 0.42rem; color: #888; text-decoration: none; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .toggle-icon { font-size: 0.45rem; color: #888; padding: 4px; transition: 0.4s; }
+        .music-controls { display: flex; align-items: center; padding: 0 14px 12px 14px; gap: 12px; opacity: 0; transition: opacity 0.4s; position: relative; }
+        .music-widget.expanded .music-controls { opacity: 1; padding-top: 10px;}
+        .ctrl-btn { background: #ffffff; color: #000000; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 0.65rem; display: flex; justify-content: center; align-items: center; transition: 0.3s; }
+        .ctrl-btn:hover { transform: scale(1.1); background: #fff; }
+        .vol-wrapper { flex: 1; display: flex; align-items: center; gap: 8px; }
+        .vol-icon { font-size: 0.42rem; color: #aaa; font-weight: 600; letter-spacing: 0.1em; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .vol-slider { flex: 1; -webkit-appearance: none; height: 3px; background: rgba(255,255,255,0.25); outline: none; cursor: pointer; border-radius: 2px;}
+        .vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: #fff; cursor: pointer; }
+
+        .footer-credit { position: relative; z-index: 3; width: 100%; text-align: center; padding: 15px 0; font-size: 0.6rem; color: #777; letter-spacing: 0.35em; text-transform: uppercase; font-weight: 600; }
+        .secret-admin-link { color: #777; text-decoration: none; transition: 0.3s; }
+        .secret-admin-link:hover { color: #fff; }
+
+        /* Responsive สำหรับมือถือและแท็บเล็ต */
+        @media (max-width: 900px) {
+            .cards-fan-container {
+                min-height: auto;
+                margin: 20px 0;
+            }
+            .cards-wrapper {
+                height: auto;
+                flex-direction: column;
+                position: relative;
+                gap: 20px;
+            }
+            .elite-card {
+                position: relative !important;
+                transform: none !important;
+                left: auto !important;
+                top: auto !important;
+                width: 100%;
+                max-width: 320px;
+                height: auto;
+                min-height: 460px;
+                filter: grayscale(0%) contrast(100%);
+            }
+            .cards-wrapper.has-selection .elite-card:not(.selected) {
+                filter: grayscale(0%) contrast(100%) brightness(1);
+                opacity: 1;
+                transform: none !important;
+            }
+            .elite-card.selected {
+                transform: translateY(0px) scale(1.02) !important;
+            }
+            .elite-card .social-buttons-column {
+                opacity: 1;
+                transform: translateY(0);
+                pointer-events: auto;
+            }
+            .music-widget {
+                bottom: 12px; right: 12px; width: 260px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="bg-image"></div>
+    <div class="bg-overlay" id="bgOverlay"></div>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="container">
+        <div class="top-nav">
+            <a href="index.html" class="btn-back"><span>‹</span> BACK</a>
+        </div>
+        
+        <div class="header-title-box">
+            <h1 id="kingTitle" class="page-title">ALL KINGS</h1>
+            <div class="leader-count-box">
+                <span class="leader-number" id="eliteCount">0</span>
+                <span id="kingLabel" class="leader-label">ALL LEADERS</span>
+            </div>
+        </div>
+
+        <div class="cards-fan-container">
+            <div class="cards-wrapper" id="cardsWrapper">
+                <div class="no-elite">-- LOADING ALL MEMBERS --</div>
+            </div>
+        </div>
+
+        <footer class="footer-credit">
+            SYSTEM DESIGN BY QA QEN <span style="opacity: 0.3; margin: 0 8px;">|</span> <a href="" class="secret-admin-link">PANEL</a>
+        </footer>
+    </div>
+
+    <!-- Music Widget -->
+    <div id="musicWidget" class="music-widget collapsed">
+        <div class="music-header" id="toggleMusicBtn">
+            <div class="cover-wrapper">
+                <img id="musicCover" class="music-cover" src="https://placehold.co/100x100/111/444?text=🎵" alt="Cover">
+            </div>
+            <div class="music-info-mini">
+                <div class="info-top">
+                    <span class="music-label">AUDIO STREAM</span>
+                    <div class="eq-visualizer"><span></span><span></span><span></span></div>
+                </div>
+                <div id="musicTitle" class="music-title">Unknown Track</div>
+                <a id="musicLink" class="music-link" href="#" target="_blank">SOURCE LINK</a>
+            </div>
+            <div id="toggleIcon" class="toggle-icon">▲</div>
+        </div>
+        <div class="music-controls">
+            <button id="playPauseBtn" class="ctrl-btn">▶</button>
+            <div class="vol-wrapper">
+                <span class="vol-icon">VOL</span>
+                <input type="range" id="volumeSlider" class="vol-slider" min="0" max="1" step="0.01" value="0.2">
+            </div>
+        </div>
+        <audio id="bgMusic" loop><source src="music.mp3" type="audio/mpeg"></audio>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5 + 0.5; this.speedX = Math.random() * 1.5 + 0.8; 
+                this.speedY = -(Math.random() * 0.8 + 0.3); this.opacity = Math.random() * 0.4 + 0.1;
+                this.tail = Math.random() * 2 + 0.5; 
+            }
+            update() {
+                this.x += this.speedX; this.y += this.speedY;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        for (let i = 0; i < 50; i++) particles.push(new Particle());
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAtR86UsD7gDgPfHu2jQYL_NG_Hf_OQ02w",
+            authDomain: "ruarap502-60618.firebaseapp.com",
+            projectId: "ruarap502-60618",
+            storageBucket: "ruarap502-60618.firebasestorage.app",
+            messagingSenderId: "168877860519",
+            appId: "1:168877860519:web:a1536aaa925bb2974cdd82"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const cardsWrapper = document.getElementById('cardsWrapper');
+        const eliteCount = document.getElementById('eliteCount');
+        const kingTitle = document.getElementById('kingTitle');
+        const kingLabel = document.getElementById('kingLabel');
+        const siteTitle = document.getElementById('siteTitle');
+        let globalDefaultAvatar = 'https://placehold.co/150/111/fff?text=UOF';
+
+        onSnapshot(doc(db, "settings", "homepage"), (docSnap) => {
+            if (docSnap.exists()) {
+                const config = docSnap.data();
+                if (config.bgUrl) document.getElementById('bg-image').style.backgroundImage = `url('${config.bgUrl}')`;
+                if (config.faviconUrl) document.getElementById('siteFavicon').href = config.faviconUrl;
+                if (config.defaultAvatar) globalDefaultAvatar = config.defaultAvatar;
+                
+                if (config.kingTitle) {
+                    kingTitle.innerText = config.kingTitle;
+                    siteTitle.innerText = config.kingTitle + " // Ruarap502";
+                }
+                if (config.kingLabel) {
+                    kingLabel.innerText = config.kingLabel;
+                }
+
+                if (config.musicTitle) document.getElementById('musicTitle').innerText = config.musicTitle;
+                if (config.musicLinkText) document.getElementById('musicLink').innerText = config.musicLinkText;
+                if (config.musicLinkUrl) document.getElementById('musicLink').href = config.musicLinkUrl;
+                if (config.musicCoverUrl) document.getElementById('musicCover').src = config.musicCoverUrl;
+            }
+        });
+
+        onSnapshot(collection(db, "kings"), (snapshot) => {
+            let eliteMembers = [];
+            snapshot.forEach(doc => {
+                eliteMembers.push({ id: doc.id, ...doc.data() });
+            });
+
+            eliteCount.innerText = eliteMembers.length;
+            cardsWrapper.innerHTML = '';
+
+            if (eliteMembers.length === 0) {
+                cardsWrapper.innerHTML = '<div class="no-elite">-- NO ELITE MEMBERS FOUND --</div>';
+                return;
+            }
+
+            const total = eliteMembers.length;
+            const centerIdx = (total - 1) / 2;
+            const isMobile = window.innerWidth <= 900;
+
+            eliteMembers.forEach((member, index) => {
+                const card = document.createElement('div');
+                card.className = 'elite-card';
+                
+                if (!isMobile) {
+                    const rotateDeg = (index - centerIdx) * 8;
+                    const translateX = (index - centerIdx) * 125;
+                    const translateY = Math.abs(index - centerIdx) * 7;
+                    const zIndex = Math.round(100 - Math.abs(index - centerIdx));
+                    card.style.transform = `translateX(${translateX}px) translateY(${translateY}px) rotate(${rotateDeg}deg)`;
+                    card.style.zIndex = zIndex;
+                }
+
+                const avatarUrl = (member.avatar && member.avatar.trim() !== "") ? member.avatar : globalDefaultAvatar;
+                const fbUrl = (member.facebookUrl && member.facebookUrl.trim() !== "") ? member.facebookUrl : "#";
+                const igUrl = (member.instagramUrl && member.instagramUrl.trim() !== "") ? member.instagramUrl : "#";
+
+                card.innerHTML = `
+                    <img src="${avatarUrl}" class="card-avatar" alt="${member.name || 'Elite'}">
+                    <span class="card-name" title="${member.name || ''}">${member.name || 'UNKNOWN'}</span>
+                    <span class="card-role">${member.role || 'LEADER'}</span>
+                    <div class="social-buttons-column">
+                        <a href="${fbUrl}" target="_blank" class="social-btn fb-btn" title="Facebook Profile">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                            Facebook
+                        </a>
+                        <a href="${igUrl}" target="_blank" class="social-btn ig-btn" title="Instagram Profile">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                            Instagram
+                        </a>
+                    </div>
+                `;
+
+                if (!isMobile) {
+                    card.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (card.classList.contains('selected')) {
+                            card.classList.remove('selected');
+                            cardsWrapper.classList.remove('has-selection');
+                            card.style.zIndex = zIndex;
+                        } else {
+                            document.querySelectorAll('.elite-card').forEach((c, idx) => {
+                                c.classList.remove('selected');
+                                const origCenter = (total - 1) / 2;
+                                c.style.zIndex = Math.round(100 - Math.abs(idx - origCenter));
+                            });
+                            card.classList.add('selected');
+                            cardsWrapper.classList.add('has-selection');
+                            card.style.zIndex = 99999;
+                        }
+                    });
+                }
+
+                cardsWrapper.appendChild(card);
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.elite-card') && window.innerWidth > 900) {
+                document.querySelectorAll('.elite-card').forEach((c, idx) => {
+                    c.classList.remove('selected');
+                    const total = document.querySelectorAll('.elite-card').length;
+                    const centerIdx = (total - 1) / 2;
+                    c.style.zIndex = Math.round(100 - Math.abs(idx - centerIdx));
+                });
+                cardsWrapper.classList.remove('has-selection');
+            }
+        });
+
+        const audio = document.getElementById('bgMusic');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const musicWidget = document.getElementById('musicWidget');
+        const toggleMusicBtn = document.getElementById('toggleMusicBtn');
+        const toggleIcon = document.getElementById('toggleIcon');
+        
+        let isPlaying = false; 
+        audio.volume = 0.2;
+        volumeSlider.value = 0.2;
+
+        const savedTime = sessionStorage.getItem('musicCurrentTime');
+        const userStopped = sessionStorage.getItem('userStoppedMusic');
+        if (savedTime) audio.currentTime = parseFloat(savedTime);
+
+        if (userStopped !== 'true' && sessionStorage.getItem('musicIsPlaying') === 'true') {
+            audio.play().then(() => { playPauseBtn.innerHTML = '❚❚'; musicWidget.classList.add('playing'); isPlaying = true; }).catch(e=>{});
+        }
+
+        window.addEventListener('beforeunload', () => {
+            sessionStorage.setItem('musicCurrentTime', audio.currentTime);
+            sessionStorage.setItem('musicIsPlaying', isPlaying);
+        });
+
+        document.body.addEventListener('click', (e) => {
+            if (sessionStorage.getItem('userStoppedMusic') === 'true') return;
+            if (!isPlaying && !e.target.closest('#playPauseBtn') && !e.target.closest('.vol-slider') && !e.target.closest('.music-widget')) {
+                audio.play().then(() => { 
+                    playPauseBtn.innerHTML = '❚❚'; 
+                    musicWidget.classList.add('playing'); 
+                    isPlaying = true; 
+                    sessionStorage.setItem('musicIsPlaying', 'true'); 
+                    sessionStorage.setItem('userStoppedMusic', 'false');
+                }).catch(e=>{});
+            }
+        });
+
+        playPauseBtn.addEventListener('click', () => {
+            if (isPlaying) { 
+                audio.pause(); 
+                playPauseBtn.html = '▶'; 
+                musicWidget.classList.remove('playing'); 
+                sessionStorage.setItem('musicIsPlaying', 'false');
+                sessionStorage.setItem('userStoppedMusic', 'true'); 
+            } else { 
+                audio.play().then(() => { 
+                    playPauseBtn.innerHTML = '❚❚'; 
+                    musicWidget.classList.add('playing'); 
+                    sessionStorage.setItem('musicIsPlaying', 'true');
+                    sessionStorage.setItem('userStoppedMusic', 'false');
+                }).catch(e=>{}); 
+            }
+            isPlaying = !isPlaying;
+        });
+
+        volumeSlider.addEventListener('input', (e) => { audio.volume = e.target.value; });
+        toggleMusicBtn.addEventListener('click', (e) => {
+            if (e.target.tagName.toLowerCase() === 'a') return;
+            musicWidget.classList.toggle('collapsed');
+            musicWidget.classList.toggle('expanded');
+            toggleIcon.style.transform = musicWidget.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0deg)';
+        });
+    </script>
+</body>
+</html>
